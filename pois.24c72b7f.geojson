@@ -1,0 +1,122 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Ford Motor Co. Saw Mill"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.459081,
+          46.754618
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Baraga County Courthouse"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.452949,
+          46.757668
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Sherrifs Dept. and Jail"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.453183,
+          46.757505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Post Office"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.45378,
+          46.75825
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Sacred Heart Church"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.45028,
+          46.75417
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "L'Anse High School"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.449387,
+          46.757993
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "L'Anse Public Grade School"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.451261,
+          46.757449
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Michigan State Hwy. Dept."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.443514,
+          46.748627
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Name": "Methodist Church"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.451272,
+          46.760042
+        ]
+      }
+    }
+  ]
+}
