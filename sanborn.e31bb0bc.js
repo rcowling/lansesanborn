@@ -72172,6 +72172,8 @@ var _Polygon = require("ol/geom/Polygon");
 
 var _Point = _interopRequireDefault(require("ol/geom/Point"));
 
+var _extent = require("ol/extent");
+
 require("bootstrap");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -72198,7 +72200,7 @@ var roads = new _Tile.default({
   source: new _XYZ.default({
     attributions: attributions,
     url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}@2x?access_token=' + key,
-    maxZoom: 20
+    maxZoom: 22
   })
 }); // Create a source for to show the GPS location
 
@@ -72216,9 +72218,8 @@ var map = new _Map.default({
   layers: [roads, imagery, gpsLayer],
   target: container,
   view: view
-});
-var extent = map.getView().calculateExtent(map.getSize());
-console.log(extent);
+}); //var extent = map.getView().calculateExtent(map.getSize());
+//console.log(extent);
 
 function spyGlass() {
   var radius = 150;
@@ -72279,6 +72280,7 @@ imagery2.set('name', 'imagery2'); // when the spyglass button is clicked run the
 (0, _jquery.default)("#spyBtn").click(function () {
   // when the spy button is clicked hide the slider
   (0, _jquery.default)(".slider").hide();
+  (0, _jquery.default)(".alert").show();
   map.getLayers().forEach(function (layer) {
     if (layer.get('name') == 'imagery2') {
       map.removeLayer(imagery2);
@@ -72290,6 +72292,7 @@ imagery2.set('name', 'imagery2'); // when the spyglass button is clicked run the
 
 (0, _jquery.default)("#opacBtn").click(function () {
   (0, _jquery.default)(".slider").show();
+  (0, _jquery.default)(".alert").hide();
 
   slider.oninput = function () {
     imagery2.setOpacity(this.value / 100);
@@ -72360,10 +72363,38 @@ navigator.geolocation.watchPosition(function (pos) {
     map.getView().fit(source.getExtent(), {
       maxZoom: 18,
       duration: 500
+    }); //Get the array of features fr
+
+    var features = gpsLayer.getSource().getFeatures(); // Go through this array and get coordinates of their geometry.
+
+    features.forEach(function (feature) {
+      var featCoords = feature.getGeometry().getCoordinates(); // the approximate extent of the sanborn map layer
+
+      var extent = [-88.464857, 46.751452, -88.43492, 46.768974]; // if the user is not within the extent of the sanborn maps display an alert
+
+      var isWithin = (0, _extent.containsXY)(extent, featCoords);
+
+      if (isWithin == false) {
+        (0, _jquery.default)("#gpsAlert").show();
+      }
     });
   }
-});
-},{"ol/ol.css":"node_modules/ol/ol.css","ol/Map":"node_modules/ol/Map.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol/source/Vector":"node_modules/ol/source/Vector.js","ol/View":"node_modules/ol/View.js","ol/source/XYZ":"node_modules/ol/source/XYZ.js","ol/proj":"node_modules/ol/proj.js","ol/render":"node_modules/ol/render.js","jquery":"node_modules/jquery/dist/jquery.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/geom/Point":"node_modules/ol/geom/Point.js","bootstrap":"node_modules/bootstrap/dist/js/bootstrap.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+}); // if the user clicks the map, hide the spy glass alert
+
+map.on('click', function (e) {
+  (0, _jquery.default)("#spyAlert").hide();
+}); // if the users clicks the return to map link
+// hide the gps alert and zoom to the default map view
+
+(0, _jquery.default)("#maplink").click(function () {
+  (0, _jquery.default)("#gpsAlert").hide();
+  view.setCenter((0, _proj.fromLonLat)([-88.4529, 46.7566]));
+  view.setZoom(18);
+}); // hide the spy glass and gps alerts by default
+
+(0, _jquery.default)("#spyAlert").hide();
+(0, _jquery.default)("#gpsAlert").hide();
+},{"ol/ol.css":"node_modules/ol/ol.css","ol/Map":"node_modules/ol/Map.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol/source/Vector":"node_modules/ol/source/Vector.js","ol/View":"node_modules/ol/View.js","ol/source/XYZ":"node_modules/ol/source/XYZ.js","ol/proj":"node_modules/ol/proj.js","ol/render":"node_modules/ol/render.js","jquery":"node_modules/jquery/dist/jquery.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/geom/Point":"node_modules/ol/geom/Point.js","ol/extent":"node_modules/ol/extent.js","bootstrap":"node_modules/bootstrap/dist/js/bootstrap.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -72391,7 +72422,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50259" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53516" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
