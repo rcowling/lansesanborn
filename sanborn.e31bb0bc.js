@@ -72183,15 +72183,16 @@ var attributions = '<a href="https://www.maptiler.com/copyright/" target="_blank
 var imagery = new _Tile.default({
   source: new _XYZ.default({
     attributions: attributions,
-    url: 'https://api.mapbox.com/v4/rcowling.8ta5jhuo/{z}/{x}/{y}@2x.png?access_token=' + key,
+    url: 'https://api.mapbox.com/v4/rcowling.2pl2vmye/{z}/{x}/{y}@2x.png?access_token=' + key,
     tileSize: 256,
     maxZoom: 22
   })
-});
+}); // old tile url: 'https://api.mapbox.com/v4/rcowling.8ta5jhuo/{z}/{x}/{y}@2x.png?access_token='
+
 var imagery2 = new _Tile.default({
   source: new _XYZ.default({
     attributions: attributions,
-    url: 'https://api.mapbox.com/v4/rcowling.8ta5jhuo/{z}/{x}/{y}@2x.png?access_token=' + key,
+    url: 'https://api.mapbox.com/v4/rcowling.2pl2vmye/{z}/{x}/{y}@2x.png?access_token=' + key,
     tileSize: 256,
     maxZoom: 22
   })
@@ -72207,8 +72208,7 @@ var roads = new _Tile.default({
 var source = new _Vector2.default();
 var gpsLayer = new _Vector.default({
   source: source
-}); //map.addLayer(gpsLayer);
-
+});
 var container = document.getElementById('map');
 var view = new _View.default({
   center: (0, _proj.fromLonLat)([-88.4529, 46.7566]),
@@ -72280,7 +72280,10 @@ imagery2.set('name', 'imagery2'); // when the spyglass button is clicked run the
 (0, _jquery.default)("#spyBtn").click(function () {
   // when the spy button is clicked hide the slider
   (0, _jquery.default)(".slider").hide();
-  (0, _jquery.default)(".alert").show();
+  (0, _jquery.default)("#spyAlert").show(); // set the opacity back to 100
+
+  imagery.setOpacity(100);
+  slider.value = 100;
   map.getLayers().forEach(function (layer) {
     if (layer.get('name') == 'imagery2') {
       map.removeLayer(imagery2);
@@ -72292,7 +72295,10 @@ imagery2.set('name', 'imagery2'); // when the spyglass button is clicked run the
 
 (0, _jquery.default)("#opacBtn").click(function () {
   (0, _jquery.default)(".slider").show();
-  (0, _jquery.default)(".alert").hide();
+  (0, _jquery.default)("#spyAlert").hide(); // set the opacity back to 100
+
+  imagery2.setOpacity(100);
+  slider.value = 100;
 
   slider.oninput = function () {
     imagery2.setOpacity(this.value / 100);
@@ -72309,7 +72315,8 @@ imagery2.set('name', 'imagery2'); // when the spyglass button is clicked run the
 (0, _jquery.default)(".nav-link").click(function () {
   (0, _jquery.default)('#aboutModal').modal('show');
 });
-var slider = document.getElementById("myRange"); // Update the sanborn layers opacity (each time you drag the slider handle)
+var slider = document.getElementById("myRange");
+var val = slider.value; // Update the sanborn layers opacity (each time you drag the slider handle)
 
 slider.oninput = function () {
   imagery.setOpacity(this.value / 100);
@@ -72375,7 +72382,7 @@ navigator.geolocation.watchPosition(function (pos) {
       var isWithin = (0, _extent.containsXY)(extent, featCoords);
 
       if (isWithin == false) {
-        (0, _jquery.default)("#gpsAlert").show();
+        document.getElementById("gpsAlert").style.visibility = "visible";
       }
     });
   }
@@ -72387,13 +72394,12 @@ map.on('click', function (e) {
 // hide the gps alert and zoom to the default map view
 
 (0, _jquery.default)("#maplink").click(function () {
-  (0, _jquery.default)("#gpsAlert").hide();
+  document.getElementById("gpsAlert").style.visibility = "hidden";
   view.setCenter((0, _proj.fromLonLat)([-88.4529, 46.7566]));
   view.setZoom(18);
 }); // hide the spy glass and gps alerts by default
 
-(0, _jquery.default)("#spyAlert").hide();
-(0, _jquery.default)("#gpsAlert").hide();
+(0, _jquery.default)("#spyAlert").hide(); //$("#gpsAlert").hide();
 },{"ol/ol.css":"node_modules/ol/ol.css","ol/Map":"node_modules/ol/Map.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol/source/Vector":"node_modules/ol/source/Vector.js","ol/View":"node_modules/ol/View.js","ol/source/XYZ":"node_modules/ol/source/XYZ.js","ol/proj":"node_modules/ol/proj.js","ol/render":"node_modules/ol/render.js","jquery":"node_modules/jquery/dist/jquery.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/geom/Point":"node_modules/ol/geom/Point.js","ol/extent":"node_modules/ol/extent.js","bootstrap":"node_modules/bootstrap/dist/js/bootstrap.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -72422,7 +72428,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53516" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50567" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
