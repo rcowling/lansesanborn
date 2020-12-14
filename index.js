@@ -1,392 +1,274 @@
-// modules are defined as an array
-// [ module function, map of requires ]
-//
-// map of requires is short require name -> numeric require
-//
-// anything defined in a previous bundle is accessed via the
-// orig method which is the require for previous bundles
-parcelRequire = (function (modules, cache, entry, globalName) {
-  // Save the require from previous bundle to this closure if any
-  var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
-  var nodeRequire = typeof require === 'function' && require;
-
-  function newRequire(name, jumped) {
-    if (!cache[name]) {
-      if (!modules[name]) {
-        // if we cannot find the module within our internal map or
-        // cache jump to the current global require ie. the last bundle
-        // that was added to the page.
-        var currentRequire = typeof parcelRequire === 'function' && parcelRequire;
-        if (!jumped && currentRequire) {
-          return currentRequire(name, true);
-        }
-
-        // If there are other bundles on this page the require from the
-        // previous one is saved to 'previousRequire'. Repeat this as
-        // many times as there are bundles until the module is found or
-        // we exhaust the require chain.
-        if (previousRequire) {
-          return previousRequire(name, true);
-        }
-
-        // Try the node require function if it exists.
-        if (nodeRequire && typeof name === 'string') {
-          return nodeRequire(name);
-        }
-
-        var err = new Error('Cannot find module \'' + name + '\'');
-        err.code = 'MODULE_NOT_FOUND';
-        throw err;
-      }
-
-      localRequire.resolve = resolve;
-      localRequire.cache = {};
-
-      var module = cache[name] = new newRequire.Module(name);
-
-      modules[name][0].call(module.exports, localRequire, module, module.exports, this);
-    }
-
-    return cache[name].exports;
-
-    function localRequire(x){
-      return newRequire(localRequire.resolve(x));
-    }
-
-    function resolve(x){
-      return modules[name][1][x] || x;
-    }
-  }
-
-  function Module(moduleName) {
-    this.id = moduleName;
-    this.bundle = newRequire;
-    this.exports = {};
-  }
-
-  newRequire.isParcelRequire = true;
-  newRequire.Module = Module;
-  newRequire.modules = modules;
-  newRequire.cache = cache;
-  newRequire.parent = previousRequire;
-  newRequire.register = function (id, exports) {
-    modules[id] = [function (require, module) {
-      module.exports = exports;
-    }, {}];
-  };
-
-  var error;
-  for (var i = 0; i < entry.length; i++) {
-    try {
-      newRequire(entry[i]);
-    } catch (e) {
-      // Save first error but execute all entries
-      if (!error) {
-        error = e;
-      }
-    }
-  }
-
-  if (entry.length) {
-    // Expose entry point to Node, AMD or browser globals
-    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
-    var mainExports = newRequire(entry[entry.length - 1]);
-
-    // CommonJS
-    if (typeof exports === "object" && typeof module !== "undefined") {
-      module.exports = mainExports;
-
-    // RequireJS
-    } else if (typeof define === "function" && define.amd) {
-     define(function () {
-       return mainExports;
-     });
-
-    // <script>
-    } else if (globalName) {
-      this[globalName] = mainExports;
-    }
-  }
-
-  // Override the current require with this new one
-  parcelRequire = newRequire;
-
-  if (error) {
-    // throw error from earlier, _after updating parcelRequire_
-    throw error;
-  }
-
-  return newRequire;
-})({"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
-
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-
-  newLink.onload = function () {
-    link.remove();
-  };
-
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
-
-    cssTimeout = null;
-  }, 50);
-}
-
-module.exports = reloadCSS;
-},{"./bundle-url":"node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
-var global = arguments[3];
-var OVERLAY_ID = '__parcel__error__overlay__';
-var OldModule = module.bundle.Module;
-
-function Module(moduleName) {
-  OldModule.call(this, moduleName);
-  this.hot = {
-    data: module.bundle.hotData,
-    _acceptCallbacks: [],
-    _disposeCallbacks: [],
-    accept: function (fn) {
-      this._acceptCallbacks.push(fn || function () {});
-    },
-    dispose: function (fn) {
-      this._disposeCallbacks.push(fn);
-    }
-  };
-  module.bundle.hotData = null;
-}
-
-module.bundle.Module = Module;
-var checkedAssets, assetsToAccept;
-var parent = module.bundle.parent;
-
-if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = "" || location.hostname;
-  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50567" + '/');
-
-  ws.onmessage = function (event) {
-    checkedAssets = {};
-    assetsToAccept = [];
-    var data = JSON.parse(event.data);
-
-    if (data.type === 'update') {
-      var handled = false;
-      data.assets.forEach(function (asset) {
-        if (!asset.isNew) {
-          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
-
-          if (didAccept) {
-            handled = true;
-          }
-        }
-      }); // Enable HMR for CSS by default.
-
-      handled = handled || data.assets.every(function (asset) {
-        return asset.type === 'css' && asset.generated.js;
-      });
-
-      if (handled) {
-        console.clear();
-        data.assets.forEach(function (asset) {
-          hmrApply(global.parcelRequire, asset);
-        });
-        assetsToAccept.forEach(function (v) {
-          hmrAcceptRun(v[0], v[1]);
-        });
-      } else if (location.reload) {
-        // `location` global exists in a web worker context but lacks `.reload()` function.
-        location.reload();
-      }
-    }
-
-    if (data.type === 'reload') {
-      ws.close();
-
-      ws.onclose = function () {
-        location.reload();
-      };
-    }
-
-    if (data.type === 'error-resolved') {
-      console.log('[parcel] ✨ Error resolved');
-      removeErrorOverlay();
-    }
-
-    if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
-      removeErrorOverlay();
-      var overlay = createErrorOverlay(data);
-      document.body.appendChild(overlay);
-    }
-  };
-}
-
-function removeErrorOverlay() {
-  var overlay = document.getElementById(OVERLAY_ID);
-
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function createErrorOverlay(data) {
-  var overlay = document.createElement('div');
-  overlay.id = OVERLAY_ID; // html encode message and stack trace
-
-  var message = document.createElement('div');
-  var stackTrace = document.createElement('pre');
-  message.innerText = data.error.message;
-  stackTrace.innerText = data.error.stack;
-  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
-  return overlay;
-}
-
-function getParents(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return [];
-  }
-
-  var parents = [];
-  var k, d, dep;
-
-  for (k in modules) {
-    for (d in modules[k][1]) {
-      dep = modules[k][1][d];
-
-      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
-        parents.push(k);
-      }
-    }
-  }
-
-  if (bundle.parent) {
-    parents = parents.concat(getParents(bundle.parent, id));
-  }
-
-  return parents;
-}
-
-function hmrApply(bundle, asset) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (modules[asset.id] || !bundle.parent) {
-    var fn = new Function('require', 'module', 'exports', asset.generated.js);
-    asset.isNew = !modules[asset.id];
-    modules[asset.id] = [fn, asset.deps];
-  } else if (bundle.parent) {
-    hmrApply(bundle.parent, asset);
-  }
-}
-
-function hmrAcceptCheck(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (!modules[id] && bundle.parent) {
-    return hmrAcceptCheck(bundle.parent, id);
-  }
-
-  if (checkedAssets[id]) {
-    return;
-  }
-
-  checkedAssets[id] = true;
-  var cached = bundle.cache[id];
-  assetsToAccept.push([bundle, id]);
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    return true;
-  }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAcceptCheck(global.parcelRequire, id);
+import 'ol/ol.css';
+import Map from 'ol/Map';
+import TileLayer from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import View from 'ol/View';
+import XYZ from 'ol/source/XYZ';
+import {fromLonLat} from 'ol/proj';
+import {getRenderPixel} from 'ol/render';
+import $ from "jquery";
+import Feature from 'ol/Feature';
+import {circular} from 'ol/geom/Polygon';
+import Point from 'ol/geom/Point';
+import {containsXY} from 'ol/extent';
+import 'bootstrap';
+
+
+// on the page load open the information modal
+$('#aboutModal').modal('show');
+
+var key = 'pk.eyJ1IjoicmNvd2xpbmciLCJhIjoiY2lzZ2YwcjZtMDFwdzNvcnQ3bmR3NXFhcCJ9.TI01a_YqNaqKWigFu70x7w';
+var attributions =
+  '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
+  '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
+
+var imagery = new TileLayer({
+  source: new XYZ({
+    attributions: attributions,
+    url: 'https://api.mapbox.com/v4/rcowling.2pl2vmye/{z}/{x}/{y}@2x.png?access_token=' + key,
+    tileSize: 256,
+    maxZoom: 22,
+  }),
+});
+// old tile url: 'https://api.mapbox.com/v4/rcowling.8ta5jhuo/{z}/{x}/{y}@2x.png?access_token='
+var imagery2 = new TileLayer({
+  source: new XYZ({
+    attributions: attributions,
+    url: 'https://api.mapbox.com/v4/rcowling.2pl2vmye/{z}/{x}/{y}@2x.png?access_token=' + key,
+    tileSize: 256,
+    maxZoom: 22,
+  }),
+});
+
+var roads = new TileLayer({
+  source: new XYZ({
+    attributions: attributions,
+    url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}@2x?access_token=' + key,
+    tileSize: 512,
+    maxZoom: 22,
+  }),
+});
+
+// Create a source for to show the GPS location
+var source = new VectorSource();
+var gpsLayer = new VectorLayer({
+  source: source
+});
+
+var container = document.getElementById('map');
+
+var view = new View({
+    center: fromLonLat([-88.4529, 46.7566]),
+    zoom: 18,
   });
+
+var map = new Map({
+  layers: [roads, imagery, gpsLayer],
+  target: container,
+  view: view
+});
+
+//var extent = map.getView().calculateExtent(map.getSize());
+//console.log(extent);
+function spyGlass () {  
+  var radius = 175;
+  document.addEventListener('keydown', function (evt) {
+    if (evt.which === 38) {
+      radius = Math.min(radius + 5, 150);
+      map.render();
+      evt.preventDefault();
+    } else if (evt.which === 40) {
+      radius = Math.max(radius - 5, 25);
+      map.render();
+      evt.preventDefault();
+    }
+  });
+
+  // get the pixel position with every move
+  var mousePosition = null;
+
+  container.addEventListener('mousemove', function (event) {
+    mousePosition = map.getEventPixel(event);
+    map.render();
+  });
+
+  container.addEventListener('mouseout', function () {
+    mousePosition = null;
+    map.render();
+  });
+
+  // before rendering the layer, do some clipping
+  imagery.on('prerender', function (event) {
+    var ctx = event.context;
+    ctx.save();
+    ctx.beginPath();
+    if (mousePosition) {
+      // only show a circle around the mouse
+      var pixel = getRenderPixel(event, mousePosition);
+      var offset = getRenderPixel(event, [
+        mousePosition[0] + radius,
+        mousePosition[1] ]);
+      var canvasRadius = Math.sqrt(
+        Math.pow(offset[0] - pixel[0], 2) + Math.pow(offset[1] - pixel[1], 2)
+      );
+      ctx.arc(pixel[0], pixel[1], canvasRadius, 0, 2 * Math.PI);
+      ctx.lineWidth = (5 * canvasRadius) / radius;
+      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      ctx.stroke();
+    }
+    ctx.clip();    
+  });
+
+  // after rendering the layer, restore the canvas context
+  imagery.on('postrender', function (event) {
+    var ctx = event.context;
+    ctx.restore();
+  });
+}; // end of spyGlass function
+
+// set the names of the layers
+imagery.set('name', 'imagery');
+imagery2.set('name', 'imagery2');
+
+// when the spyglass button is clicked run the spyglass function
+// remove the opacity imagery layer
+$("#spyBtn").click( function() {
+  // when the spy button is clicked hide the slider
+  $(".slider").hide();
+  $("#spyAlert").show();
+  // set the opacity back to 100
+  imagery.setOpacity(100);
+  slider.value = 100;
+  map.getLayers().forEach(function (layer) {    
+    if (layer.get('name') == 'imagery2') {
+        map.removeLayer(imagery2);
+        map.addLayer(imagery);        
+    }
+  });  
+   spyGlass();  
+});
+
+// When the opacity button is clicked add the alternative imagery layer
+$("#opacBtn").click ( function () {
+  $(".slider").show(); 
+  $("#spyAlert").hide(); 
+  // set the opacity back to 100
+  imagery2.setOpacity(100);
+  slider.value = 100;
+  slider.oninput = function() {
+    imagery2.setOpacity(this.value / 100); 
+  }
+  map.getLayers().forEach(function (layer) {    
+    if (layer.get('name') == 'imagery') {
+        //map.removeLayer(imagery2);
+        map.removeLayer(imagery);
+        map.addLayer(imagery2);
+    }     
+  });  
+});  
+
+$(".nav-link").click ( function () {
+  $('#aboutModal').modal('show');
+});
+
+var slider = document.getElementById("myRange");
+var val = slider.value;
+
+// Update the sanborn layers opacity (each time you drag the slider handle)
+slider.oninput = function() {
+ imagery.setOpacity(this.value / 100);  
 }
 
-function hmrAcceptRun(bundle, id) {
-  var cached = bundle.cache[id];
-  bundle.hotData = {};
-
-  if (cached) {
-    cached.hot.data = bundle.hotData;
+// When an item is selected from the dropdown menu zoom to its location
+$( ".custom-select" ).change(function(evt) {
+  if (evt.target.value === "lhs") {    
+    view.setCenter(fromLonLat([-88.44941245354919, 46.75749572656625]));
+    view.setZoom(18);
+  } else if (evt.target.value === "court") {
+    view.setCenter(fromLonLat([-88.45311796075435, 46.757867204197]));
+    view.setZoom(18);
+  } else if (evt.target.value === "lpgs") {
+    view.setCenter(fromLonLat([-88.45143389231637, 46.75774951346722]));
+    view.setZoom(18);
+  } else if (evt.target.value === "post") {
+    view.setCenter(fromLonLat([-88.45363483924818, 46.758071140056245]));
+    view.setZoom(18);
+  } else if (evt.target.value === "jail") {
+    view.setCenter(fromLonLat([-88.45332307153872, 46.75771516231458]));
+    view.setZoom(18);
+  } else if (evt.target.value === "saw") {
+    view.setCenter(fromLonLat([-88.45853043756406, 46.75539447429435]));
+    view.setZoom(18);
+  } else if (evt.target.value === "sacred") {
+    view.setCenter(fromLonLat([-88.45030384130378, 46.75427739696923]));
+    view.setZoom(18);
+  } else if (evt.target.value === "mchurch") {
+    view.setCenter(fromLonLat([-88.45114059509795, 46.759869365942166]));
+    view.setZoom(18);
+  } else if (evt.target.value === "hwydep") {
+    view.setCenter(fromLonLat([ -88.44280188273223, 46.74855510903387]));
+    view.setZoom(18);
   }
+});
 
-  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
-    cached.hot._disposeCallbacks.forEach(function (cb) {
-      cb(bundle.hotData);
+// Add geolocation from the browser's geolocation API
+navigator.geolocation.watchPosition(function(pos) {
+  const coords = [pos.coords.longitude, pos.coords.latitude];
+  const accuracy = circular(coords, pos.coords.accuracy);
+  source.clear(true);
+  source.addFeatures([
+    new Feature(accuracy.transform('EPSG:4326', map.getView().getProjection())),
+    new Feature(new Point(fromLonLat(coords)))
+  ]);  
+}, function(error) {
+  alert(`ERROR: ${error.message}`);
+}, {
+  enableHighAccuracy: true
+});
+
+// When the locate button is clicked display the users geolocation
+$("#locateBtn").click ( function () {
+  if (!source.isEmpty()) {
+    map.getView().fit(source.getExtent(), {
+      maxZoom: 18,
+      duration: 500
     });
-  }
 
-  delete bundle.cache[id];
-  bundle(id);
-  cached = bundle.cache[id];
+    //Get the array of features fr
+    var features = gpsLayer.getSource().getFeatures();
 
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    cached.hot._acceptCallbacks.forEach(function (cb) {
-      cb();
-    });
+    // Go through this array and get coordinates of their geometry.
+    features.forEach(function(feature) {
+       var featCoords = feature.getGeometry().getCoordinates();
+       // the approximate extent of the sanborn map layer
+      var extent = [-88.464857,46.751452,-88.43492,46.768974];
+      // if the user is not within the extent of the sanborn maps display an alert
+      var isWithin = containsXY(extent, featCoords);
+      if (isWithin == false) {    
+        document.getElementById("gpsAlert").style.visibility = "visible";
+      }
+    });    
+  } 
+});
 
-    return true;
-  }
-}
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
-//# sourceMappingURL=/index.js.map
+// if the user clicks the map, hide the spy glass alert
+map.on('click', function(e) {
+  $("#spyAlert").hide();
+});
+
+// if the users clicks the return to map link
+// hide the gps alert and zoom to the default map view
+$("#maplink").click ( function () {
+  document.getElementById("gpsAlert").style.visibility = "hidden";
+  view.setCenter(fromLonLat([-88.4529, 46.7566]));
+  view.setZoom(18);
+});
+
+// hide the spy glass and gps alerts by default
+$("#spyAlert").hide();
+
+
+
+
+

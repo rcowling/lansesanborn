@@ -72178,6 +72178,8 @@ require("bootstrap");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// on the page load open the information modal
+(0, _jquery.default)('#aboutModal').modal('show');
 var key = 'pk.eyJ1IjoicmNvd2xpbmciLCJhIjoiY2lzZ2YwcjZtMDFwdzNvcnQ3bmR3NXFhcCJ9.TI01a_YqNaqKWigFu70x7w';
 var attributions = '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' + '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';
 var imagery = new _Tile.default({
@@ -72201,6 +72203,7 @@ var roads = new _Tile.default({
   source: new _XYZ.default({
     attributions: attributions,
     url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}@2x?access_token=' + key,
+    tileSize: 512,
     maxZoom: 22
   })
 }); // Create a source for to show the GPS location
@@ -72222,7 +72225,7 @@ var map = new _Map.default({
 //console.log(extent);
 
 function spyGlass() {
-  var radius = 150;
+  var radius = 175;
   document.addEventListener('keydown', function (evt) {
     if (evt.which === 38) {
       radius = Math.min(radius + 5, 150);
@@ -72399,7 +72402,7 @@ map.on('click', function (e) {
   view.setZoom(18);
 }); // hide the spy glass and gps alerts by default
 
-(0, _jquery.default)("#spyAlert").hide(); //$("#gpsAlert").hide();
+(0, _jquery.default)("#spyAlert").hide();
 },{"ol/ol.css":"node_modules/ol/ol.css","ol/Map":"node_modules/ol/Map.js","ol/layer/Tile":"node_modules/ol/layer/Tile.js","ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol/source/Vector":"node_modules/ol/source/Vector.js","ol/View":"node_modules/ol/View.js","ol/source/XYZ":"node_modules/ol/source/XYZ.js","ol/proj":"node_modules/ol/proj.js","ol/render":"node_modules/ol/render.js","jquery":"node_modules/jquery/dist/jquery.js","ol/Feature":"node_modules/ol/Feature.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/geom/Point":"node_modules/ol/geom/Point.js","ol/extent":"node_modules/ol/extent.js","bootstrap":"node_modules/bootstrap/dist/js/bootstrap.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -72428,7 +72431,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50567" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64118" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
